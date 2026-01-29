@@ -6,12 +6,23 @@ import {
   ActivityIndicator,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { api } from "../services/api";
 import { Event } from "../types/types";
+import { RootStackParamList } from "../routes/AppRoutes";
+
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "EventList"
+>;
 
 export function EventListScreen() {
+  const navigation = useNavigation<NavigationProp>();
+
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,16 +92,18 @@ export function EventListScreen() {
       <FlatList
         data={filteredEvents}
         keyExtractor={(item) => item.id}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>Nenhum evento encontrado.</Text>
-        }
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() =>
+              navigation.navigate("EventDetails", { event: item })
+            }
+          >
             <Text style={styles.title}>{item.title}</Text>
             <Text>{item.date}</Text>
             <Text>{item.location}</Text>
             <Text>Status: {item.status}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -124,10 +137,5 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
     fontSize: 16,
-  },
-  emptyText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "#666",
   },
 });

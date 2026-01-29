@@ -1,12 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView, StyleSheet } from "react-native";
 
-import { EventListScreen } from "./src/screens/EventListScreen";
+import { AppRoutes } from "./src/routes/AppRoutes";
 
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
-      <EventListScreen />
+      <AppRoutes />
       <StatusBar style="auto" />
     </SafeAreaView>
   );
