@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  TextInput,
 } from "react-native";
 
 import { api } from "../services/api";
@@ -14,6 +15,7 @@ export function EventListScreen() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [search, setSearch] = useState("");
 
   async function fetchEvents() {
     try {
@@ -32,6 +34,16 @@ export function EventListScreen() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  const filteredEvents = useMemo(() => {
+    if (!search.trim()) {
+      return events;
+    }
+
+    return events.filter((event) =>
+      event.title.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [search, events]);
 
   if (loading) {
     return (
@@ -52,9 +64,19 @@ export function EventListScreen() {
 
   return (
     <View style={styles.container}>
+      <TextInput
+        placeholder="Buscar evento pelo título"
+        value={search}
+        onChangeText={setSearch}
+        style={styles.input}
+      />
+
       <FlatList
-        data={events}
+        data={filteredEvents}
         keyExtractor={(item) => item.id}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Nenhum evento encontrado.</Text>
+        }
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Text style={styles.title}>{item.title}</Text>
@@ -78,6 +100,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  input: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    marginBottom: 16,
+  },
   card: {
     padding: 12,
     marginBottom: 12,
@@ -87,5 +117,10 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
     fontSize: 16,
+  },
+  emptyText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#666",
   },
 });
