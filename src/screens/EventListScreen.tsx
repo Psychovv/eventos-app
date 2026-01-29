@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Button,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -43,8 +44,7 @@ export function EventListScreen() {
       setLoading(false);
     }
   }
- 
-  //elemento teste mudar talvez****
+
   useFocusEffect(
     useCallback(() => {
       fetchEvents();
@@ -85,6 +85,11 @@ export function EventListScreen() {
 
   return (
     <View style={styles.container}>
+      <Button
+        title="Novo evento"
+        onPress={() => navigation.navigate("CreateEvent")}
+      />
+
       <TextInput
         placeholder="Buscar evento pelo título"
         value={search}
@@ -132,7 +137,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 6,
     paddingHorizontal: 10,
-    marginBottom: 16,
+    marginVertical: 16,
   },
   card: {
     padding: 12,
