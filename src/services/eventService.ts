@@ -10,6 +10,10 @@ export async function updateEventStatus(
   id: string,
   data: UpdateEventDTO
 ): Promise<Event> {
-  const response = await api.patch<Event>(`/events/${id}`, data);
+  const response = await api.put<Event>(`/events/${id}`, data);
   return response.data;
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  await api.delete(`/events/${id}`);
 }

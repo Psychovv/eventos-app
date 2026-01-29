@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { api } from "../services/api";
@@ -37,16 +37,19 @@ export function EventListScreen() {
       const response = await api.get<Event[]>("/events");
       setEvents(response.data);
       setFilteredEvents(response.data);
-    } catch (err) {
+    } catch {
       setError(true);
     } finally {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+ 
+  //elemento teste mudar talvez****
+  useFocusEffect(
+    useCallback(() => {
+      fetchEvents();
+    }, [])
+  );
 
   function handleSearch(text: string) {
     setSearch(text);
@@ -92,6 +95,9 @@ export function EventListScreen() {
       <FlatList
         data={filteredEvents}
         keyExtractor={(item) => item.id}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Nenhum evento encontrado.</Text>
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
@@ -137,5 +143,10 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
     fontSize: 16,
+  },
+  emptyText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#666",
   },
 });
