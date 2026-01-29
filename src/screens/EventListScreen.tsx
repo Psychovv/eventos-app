@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { Event } from "../types/types";
 
 export function EventListScreen() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
@@ -24,6 +25,7 @@ export function EventListScreen() {
 
       const response = await api.get<Event[]>("/events");
       setEvents(response.data);
+      setFilteredEvents(response.data);
     } catch (err) {
       setError(true);
     } finally {
@@ -35,15 +37,20 @@ export function EventListScreen() {
     fetchEvents();
   }, []);
 
-  const filteredEvents = useMemo(() => {
-    if (!search.trim()) {
-      return events;
+  function handleSearch(text: string) {
+    setSearch(text);
+
+    if (!text.trim()) {
+      setFilteredEvents(events);
+      return;
     }
 
-    return events.filter((event) =>
-      event.title.toLowerCase().includes(search.toLowerCase())
+    const filtered = events.filter((event) =>
+      event.title.toLowerCase().includes(text.toLowerCase())
     );
-  }, [search, events]);
+
+    setFilteredEvents(filtered);
+  }
 
   if (loading) {
     return (
@@ -67,7 +74,7 @@ export function EventListScreen() {
       <TextInput
         placeholder="Buscar evento pelo título"
         value={search}
-        onChangeText={setSearch}
+        onChangeText={handleSearch}
         style={styles.input}
       />
 
