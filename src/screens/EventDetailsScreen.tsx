@@ -33,40 +33,38 @@ export function EventDetailsScreen() {
   const [deleting, setDeleting] = useState(false);
 
   async function handleUpdateStatus(newStatus: EventStatus) {
+    console.log("Mudando status para:", newStatus);
     try {
       setUpdatingStatus(true);
       await updateEventStatus(event.id, { status: newStatus });
       setStatus(newStatus);
-      Alert.alert("Sucesso", "Status atualizado com sucesso!");
+      Alert.alert("Sucesso", "Status atualizado!");
     } catch {
-      Alert.alert("Erro", "Não foi possível atualizar o status.");
+      Alert.alert("Erro", "Não deu pra mudar o status.");
     } finally {
       setUpdatingStatus(false);
     }
   }
 
   function handleDeleteEvent() {
-    console.log("Cliquei em remover evento");
-
     Alert.alert(
-      "Confirmar exclusão",
-      "Tem certeza que deseja remover este evento?",
+      "Excluir",
+      "Quer mesmo apagar esse evento?",
       [
         { text: "Cancelar", style: "cancel" },
         {
-          text: "Remover",
+          text: "Apagar",
           style: "destructive",
           onPress: async () => {
-            console.log("Confirmou remoção"); 
-
+            console.log("Apagando evento ID:", event.id);
             try {
               setDeleting(true);
               await deleteEvent(event.id);
-              Alert.alert("Sucesso", "Evento removido com sucesso!");
+              Alert.alert("Pronto", "Evento apagado.");
               navigation.goBack();
             } catch (error) {
-              console.log("Erro ao remover:", error);
-              Alert.alert("Erro", "Não foi possível remover o evento.");
+              console.log("Erro ao apagar:", error);
+              Alert.alert("Erro", "Não deu pra apagar.");
             } finally {
               setDeleting(false);
             }
@@ -109,7 +107,7 @@ export function EventDetailsScreen() {
 
       <View style={styles.deleteButton}>
         <Button
-          title={deleting ? "Removendo..." : "Remover evento"}
+          title={deleting ? "Apagando..." : "Apagar Evento"}
           color="red"
           onPress={handleDeleteEvent}
           disabled={deleting}
@@ -123,6 +121,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 20,

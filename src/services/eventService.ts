@@ -1,8 +1,13 @@
 import { api } from "./api";
-import { Event, UpdateEventDTO } from "../types/types";
+import { Event, UpdateEventDTO, CreateEventDTO } from "../types/types";
 
 export async function getEvents(): Promise<Event[]> {
   const response = await api.get<Event[]>("/events");
+  return response.data;
+}
+
+export async function createEvent(data: CreateEventDTO): Promise<Event> {
+  const response = await api.post<Event>("/events", data);
   return response.data;
 }
 

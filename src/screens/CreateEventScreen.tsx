@@ -12,7 +12,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { RootStackParamList } from "../routes/AppRoutes";
 import { EventStatus, CreateEventDTO } from "../types/types";
-import { api } from "../services/api";
+import { createEvent } from "../services/eventService";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -29,8 +29,10 @@ export function CreateEventScreen() {
   const [loading, setLoading] = useState(false);
 
   async function handleCreateEvent() {
+    console.log("Tentando criar evento:", { title, date, location, status });
+
     if (!title || !date || !location) {
-      Alert.alert("Erro", "Preencha todos os campos.");
+      Alert.alert("Atenção", "Preenche tudo aí, por favor.");
       return;
     }
 
@@ -43,11 +45,13 @@ export function CreateEventScreen() {
 
     try {
       setLoading(true);
-      await api.post("/events", newEvent);
-      Alert.alert("Sucesso", "Evento criado com sucesso!");
+      await createEvent(newEvent); 
+      console.log("Evento criado com sucesso!");
+      Alert.alert("Boa!", "Evento criado.");
       navigation.goBack();
-    } catch {
-      Alert.alert("Erro", "Não foi possível criar o evento.");
+    } catch (error) {
+      console.log("Deu ruim ao criar:", error);
+      Alert.alert("Erro", "Não deu pra criar o evento.");
     } finally {
       setLoading(false);
     }
@@ -67,7 +71,7 @@ export function CreateEventScreen() {
         style={styles.input}
         value={date}
         onChangeText={setDate}
-        placeholder="YYYY-MM-DD"
+        placeholder="AAAA-MM-DD"
       />
 
       <Text style={styles.label}>Local</Text>
@@ -81,21 +85,24 @@ export function CreateEventScreen() {
       <View style={styles.statusButtons}>
         <Button
           title="Planejado"
+          color={status === "PLANNED" ? "#007AFF" : "#ccc"}
           onPress={() => setStatus("PLANNED")}
         />
         <Button
           title="Confirmado"
+          color={status === "CONFIRMED" ? "#007AFF" : "#ccc"}
           onPress={() => setStatus("CONFIRMED")}
         />
         <Button
           title="Cancelado"
+          color={status === "CANCELLED" ? "#007AFF" : "#ccc"}
           onPress={() => setStatus("CANCELLED")}
         />
       </View>
 
       <View style={styles.createButton}>
         <Button
-          title={loading ? "Criando..." : "Criar evento"}
+          title={loading ? "Salvando..." : "Salvar"}
           onPress={handleCreateEvent}
           disabled={loading}
         />
@@ -108,6 +115,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fff',
   },
   label: {
     fontWeight: "bold",

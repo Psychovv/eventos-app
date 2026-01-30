@@ -12,7 +12,7 @@ import {
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { api } from "../services/api";
+import { getEvents } from "../services/eventService";
 import { Event } from "../types/types";
 import { RootStackParamList } from "../routes/AppRoutes";
 
@@ -32,13 +32,16 @@ export function EventListScreen() {
 
   async function fetchEvents() {
     try {
+      console.log("Buscando eventos na API...");
       setLoading(true);
       setError(false);
 
-      const response = await api.get<Event[]>("/events");
-      setEvents(response.data);
-      setFilteredEvents(response.data);
-    } catch {
+      const data = await getEvents();
+      console.log("Eventos carregados:", data.length);
+      setEvents(data);
+      setFilteredEvents(data);
+    } catch (err) {
+      console.log("Erro no fetch:", err);
       setError(true);
     } finally {
       setLoading(false);
@@ -70,7 +73,7 @@ export function EventListScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
-        <Text>Carregando eventos...</Text>
+        <Text>Carregando...</Text>
       </View>
     );
   }
@@ -78,7 +81,8 @@ export function EventListScreen() {
   if (error) {
     return (
       <View style={styles.center}>
-        <Text>Erro ao carregar eventos.</Text>
+        <Text>Deu erro ao carregar.</Text>
+        <Button title="Tentar de novo" onPress={fetchEvents} />
       </View>
     );
   }
@@ -86,12 +90,12 @@ export function EventListScreen() {
   return (
     <View style={styles.container}>
       <Button
-        title="Novo evento"
+        title="Adicionar Evento"
         onPress={() => navigation.navigate("CreateEvent")}
       />
 
       <TextInput
-        placeholder="Buscar evento pelo título"
+        placeholder="Pesquisar..."
         value={search}
         onChangeText={handleSearch}
         style={styles.input}
@@ -101,7 +105,7 @@ export function EventListScreen() {
         data={filteredEvents}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>Nenhum evento encontrado.</Text>
+          <Text style={styles.emptyText}>Nada por aqui.</Text>
         }
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -125,6 +129,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fff',
   },
   center: {
     flex: 1,
@@ -143,11 +148,14 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
     borderRadius: 8,
-    backgroundColor: "#eee",
+    backgroundColor: "#f9f9f9",
+    borderWidth: 1,
+    borderColor: "#eee"
   },
   title: {
     fontWeight: "bold",
     fontSize: 16,
+    marginBottom: 4,
   },
   emptyText: {
     textAlign: "center",
