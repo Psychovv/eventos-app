@@ -59,8 +59,8 @@ https://github.com/MatheusAndrade23/internal-events-api
 ### 1️⃣ Clonar o repositório do frontend
 
 ```bash
-git clone https://github.com/Psychovv/internal-events-app.git
-cd internal-events-app
+git clone https://github.com/Psychovv/events-app.git
+cd events-app
 ````
 
 ---
