@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Button,
   Alert,
+  Platform,
 } from "react-native";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -33,44 +34,63 @@ export function EventDetailsScreen() {
   const [deleting, setDeleting] = useState(false);
 
   async function handleUpdateStatus(newStatus: EventStatus) {
-    console.log("Mudando status para:", newStatus);
     try {
       setUpdatingStatus(true);
       await updateEventStatus(event.id, { status: newStatus });
       setStatus(newStatus);
-      Alert.alert("Sucesso", "Status atualizado!");
+      
+      if (Platform.OS === 'web') {
+        alert("Sucesso: Status atualizado!");
+      } else {
+        Alert.alert("Sucesso", "Status atualizado!");
+      }
     } catch {
-      Alert.alert("Erro", "Não deu pra mudar o status.");
+      Alert.alert("Erro", "Não foi possível atualizar o status.");
     } finally {
       setUpdatingStatus(false);
     }
   }
 
-  console.log("Renderizando detalhes do evento ID:", event.id);
+  //teste
+  console.log("id do evento:", event.id);
+  
+  async function performDelete() {
+    try {
+      setDeleting(true);
+      await deleteEvent(event.id);
+      
+      if (Platform.OS === 'web') {
+        alert("Evento excluído com sucesso.");
+      } else {
+        Alert.alert("Sucesso", "Evento excluído com sucesso.");
+      }
+      
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível excluir o evento.");
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   function handleDeleteEvent() {
+    if (Platform.OS === 'web') {
+      const confirm = window.confirm("Tem certeza que deseja excluir este evento?");
+      if (confirm) {
+        performDelete();
+      }
+      return;
+    }
+
     Alert.alert(
-      "Excluir",
-      "Quer mesmo apagar esse evento?",
+      "Excluir Evento",
+      "Tem certeza que deseja excluir este evento?",
       [
         { text: "Cancelar", style: "cancel" },
         {
-          text: "Apagar",
+          text: "Excluir",
           style: "destructive",
-          onPress: async () => {
-            console.log("Apagando evento ID:", event.id);
-            try {
-              setDeleting(true);
-              await deleteEvent(event.id);
-              Alert.alert("Pronto", "Evento apagado.");
-              navigation.goBack();
-            } catch (error) {
-              console.log("Erro ao apagar:", error);
-              Alert.alert("Erro", "Não deu pra apagar.");
-            } finally {
-              setDeleting(false);
-            }
-          },
+          onPress: performDelete,
         },
       ]
     );
@@ -109,7 +129,7 @@ export function EventDetailsScreen() {
 
       <View style={styles.deleteButton}>
         <Button
-          title={deleting ? "Apagando..." : "Apagar Evento"}
+          title={deleting ? "Excluindo..." : "Excluir Evento"}
           color="red"
           onPress={handleDeleteEvent}
           disabled={deleting}
