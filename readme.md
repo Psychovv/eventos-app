@@ -13,6 +13,7 @@ https://github.com/MatheusAndrade23/internal-events-api
 - Axios
 - React Navigation (Native Stack)
 - Zod
+- AsyncStorage
 
 ---
 
@@ -24,6 +25,7 @@ https://github.com/MatheusAndrade23/internal-events-api
 - Atualização de status do evento
 - Exclusão de eventos
 - Filtro de eventos por título
+- Persistência local da lista de eventos
 
 ---
 
@@ -33,6 +35,14 @@ https://github.com/MatheusAndrade23/internal-events-api
 - Regras centralizadas em schemas
 - Feedback visual por campo (input destacado em vermelho e mensagem de erro)
 - Normalização de datas para formato ISO antes do envio para a API
+
+---
+
+## 💾 Persistência Local
+
+- A lista de eventos é armazenada localmente utilizando **AsyncStorage**
+- Em caso de falha na requisição à API, os dados salvos localmente são utilizados
+- Garante melhor experiência de uso em cenários sem conexão ou instabilidade da API
 
 ---
 
