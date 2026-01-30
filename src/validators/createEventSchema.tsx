@@ -7,7 +7,7 @@ export const createEventSchema = z.object({
 
   date: z
     .string()
-    .min(1, "Data é obrigatória")
+    .min(10, "Data incompleta") 
     .refine(
       (value) => !isNaN(Date.parse(value)),
       "Formato de data inválido"
@@ -24,7 +24,4 @@ export const createEventSchema = z.object({
   ]),
 });
 
-// 👉 tipo inferido automaticamente (opcional, mas profissional)
-export type CreateEventFormData = z.infer<
-  typeof createEventSchema
->;
+export type CreateEventFormData = z.infer<typeof createEventSchema>;

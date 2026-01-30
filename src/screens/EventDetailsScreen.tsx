@@ -46,6 +46,8 @@ export function EventDetailsScreen() {
     }
   }
 
+  console.log("Renderizando detalhes do evento ID:", event.id);
+
   function handleDeleteEvent() {
     Alert.alert(
       "Excluir",

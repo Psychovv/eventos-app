@@ -6,20 +6,18 @@ import {
   StyleSheet,
   Button,
   Alert,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ZodError } from "zod";
 
 import { RootStackParamList } from "../routes/AppRoutes";
-import { EventStatus, CreateEventDTO } from "../types/types";
+import { EventStatus } from "../types/types";
 import { createEvent } from "../services/eventService";
 import { createEventSchema } from "../validators/createEventSchema";
 
-type NavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "EventList"
->;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "EventList">;
 
 type FormErrors = {
   title?: string;
@@ -37,21 +35,43 @@ export function CreateEventScreen() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
+  
+  function handleDateChange(text: string) {
+    const cleaned = text.replace(/\D/g, ""); 
+    let formatted = cleaned;
+
+    if (cleaned.length > 4) {
+      formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}`;
+    }
+    if (cleaned.length > 6) {
+      formatted = `${formatted}-${cleaned.slice(6, 8)}`;
+    }
+
+    setDate(formatted);
+  }
+
   async function handleCreateEvent() {
     setErrors({});
 
-    const newEvent: CreateEventDTO = {
+    
+    const rawData = {
       title,
-      date: new Date(date).toISOString(),
+      date,
       location,
       status,
     };
 
     try {
-      createEventSchema.parse(newEvent);
+      
+      createEventSchema.parse(rawData);
 
       setLoading(true);
-      await createEvent(newEvent);
+
+      
+      await createEvent({
+        ...rawData,
+        date: new Date(date).toISOString(),
+      });
 
       Alert.alert("Boa!", "Evento criado.");
       navigation.goBack();
@@ -75,47 +95,36 @@ export function CreateEventScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.label}>Título</Text>
       <TextInput
-        style={[
-          styles.input,
-          errors.title && styles.inputError,
-        ]}
+        style={[styles.input, errors.title && styles.inputError]}
         value={title}
         onChangeText={setTitle}
+        placeholder="Nome do evento"
       />
-      {errors.title && (
-        <Text style={styles.errorText}>{errors.title}</Text>
-      )}
+      {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
 
       <Text style={styles.label}>Data</Text>
       <TextInput
-        style={[
-          styles.input,
-          errors.date && styles.inputError,
-        ]}
+        style={[styles.input, errors.date && styles.inputError]}
         value={date}
-        onChangeText={setDate}
+        onChangeText={handleDateChange}
         placeholder="YYYY-MM-DD"
+        keyboardType="numeric"
+        maxLength={10}
       />
-      {errors.date && (
-        <Text style={styles.errorText}>{errors.date}</Text>
-      )}
+      {errors.date && <Text style={styles.errorText}>{errors.date}</Text>}
 
       <Text style={styles.label}>Local</Text>
       <TextInput
-        style={[
-          styles.input,
-          errors.location && styles.inputError,
-        ]}
+        style={[styles.input, errors.location && styles.inputError]}
         value={location}
         onChangeText={setLocation}
+        placeholder="Onde vai ser?"
       />
       {errors.location && (
-        <Text style={styles.errorText}>
-          {errors.location}
-        </Text>
+        <Text style={styles.errorText}>{errors.location}</Text>
       )}
 
       <Text style={styles.label}>Status</Text>
@@ -139,12 +148,12 @@ export function CreateEventScreen() {
 
       <View style={styles.createButton}>
         <Button
-          title={loading ? "Salvando..." : "Salvar"}
+          title={loading ? "Salvando..." : "Salvar Evento"}
           onPress={handleCreateEvent}
           disabled={loading}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -166,7 +175,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   inputError: {
-    borderColor: "red",
+    borderColor: "red", 
   },
   errorText: {
     color: "red",
@@ -179,5 +188,6 @@ const styles = StyleSheet.create({
   },
   createButton: {
     marginTop: 30,
+    marginBottom: 40,
   },
 });
