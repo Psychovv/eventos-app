@@ -1,4 +1,3 @@
-````md
 # 📱 Internal Events App
 
 Aplicação mobile desenvolvida com **React Native + Expo** para gerenciamento de eventos corporativos, consumindo uma API REST disponível no repositório  
@@ -119,6 +118,4 @@ O projeto pode ser executado em:
 * navegador (Expo Web)
 
 ---
-
-```
 
