@@ -60,7 +60,7 @@ https://github.com/MatheusAndrade23/internal-events-api
 
 ```bash
 git clone https://github.com/Psychovv/eventos-app.git
-cd events-app
+cd eventos-app
 ````
 
 ---
